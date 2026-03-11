@@ -99,7 +99,7 @@ window.Quarto = {
 </script>
 
 <meta property="og:title" content="Dr.&nbsp;Mohammad Nabhan - Interactive Demo">
-<meta property="og:description" content="Visualize the COO trajectory on engineering benchmark problems">
+<meta property="og:description" content="Explore the COO two-phase algorithm on classic optimisation benchmarks">
 <meta property="og:site_name" content="Dr. Mohammad Nabhan">
 </head>
 
@@ -164,7 +164,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Interactive Demo</h1>
-<p class="subtitle lead">Visualize the COO trajectory on engineering benchmark problems</p>
+<p class="subtitle lead">Explore the COO two-phase algorithm on classic optimisation benchmarks</p>
 </div>
 
 
@@ -181,98 +181,96 @@ window.Quarto = {
 </header>
 
 
-<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Important
+Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>The interactive demo will be activated upon paper publication.</strong></p>
-<p>The demo runs entirely in your browser — no server, no installation, no account required. It uses <a href="https://marimo.io">marimo</a>, a reactive Python notebook compiled to WebAssembly via Pyodide. There is no concurrency limit and no compute cost: the algorithm runs on your machine.</p>
+<p><strong>Pre-publication preview.</strong> This demo uses simplified 2D test functions to illustrate the algorithm’s behaviour. The full benchmark suite (P1–P6) will be activated upon paper publication.</p>
 </div>
 </div>
+<section id="try-it" class="level2">
+<h2 class="anchored" data-anchor-id="try-it">Try It</h2>
+<p>Use the controls on the left to select a test problem and tune the algorithm parameters, then click <strong>Run COO</strong> to watch both phases unfold. Click <strong>Run Both</strong> to compare directly against vanilla gradient projection (PGD).</p>
+<iframe src="demo_widget.html" width="100%" height="720px" style="border:none; border-radius:6px; display:block;" title="COO Interactive Demo">
+</iframe>
+</section>
 <section id="what-the-demo-shows" class="level2">
 <h2 class="anchored" data-anchor-id="what-the-demo-shows">What the Demo Shows</h2>
-<p>The COO algorithm alternates between two phases that are visually distinct in the trajectory plot:</p>
-<p><strong>Lumen phase</strong> — the trajectory moves like a frictionless billiard ball inside the feasible region <span class="math inline">\(\Omega\)</span>, bouncing off constraint boundaries with exact energy conservation. At each boundary contact, the Snell-KKT operator is applied and a KKT multiplier <span class="math inline">\(\lambda_i^{(j)}\)</span> is emitted and accumulated.</p>
-<p><strong>Ombra phase</strong> — when the Adaptive Percentile Filter detects a low-energy state, the dissipative integrator fires. The trajectory converges exponentially to the local minimum (visible as a rapid spiral inward), then the Lumen resumes from the same state it left.</p>
-<p>The <strong>Luminosity Flux panel</strong> shows the running average <span class="math inline">\(\bar{\Lambda}_k\)</span> converging toward the true KKT multiplier <span class="math inline">\(\lambda^*\)</span> as boundary events accumulate — the dual certificate building up in real time.</p>
+<p>The demo runs three problems that expose COO’s core strength: reliably finding the <strong>global</strong> minimum on multimodal landscapes where gradient-only methods get trapped.</p>
+<p><strong>Styblinski-Tang</strong> — four local minima in <span class="math inline">\([-5,5]^2\)</span>. The global minimum is at <span class="math inline">\((-2.90, -2.90)\)</span>, <span class="math inline">\(f \approx -78.33\)</span>. PGD started from <span class="math inline">\((2.5,\,2.5)\)</span> converges to a local minimum at <span class="math inline">\((2.75,\,2.75)\)</span>, <span class="math inline">\(f \approx -50\)</span>. COO’s Lumen sweep identifies the correct basin; Ombra then converges to the global.</p>
+<p><strong>Rastrigin</strong> — approximately 50 local minima in <span class="math inline">\([-5.12,5.12]^2\)</span>, global minimum at the origin. PGD from <span class="math inline">\((3.5,\,3.5)\)</span> locks into the nearest local basin. The Lumen sweep disperses evaluations across the full domain and identifies the correct basin before refinement begins.</p>
+<p><strong>Himmelblau</strong> — four <em>equal</em> global minima, all with <span class="math inline">\(f=0\)</span>. This problem highlights a different capability: Lumen illuminates all four basins simultaneously, making COO’s solution independent of starting point. PGD from any corner finds only the nearest minimum.</p>
 </section>
-<section id="what-you-will-be-able-to-adjust" class="level2">
-<h2 class="anchored" data-anchor-id="what-you-will-be-able-to-adjust">What You Will Be Able to Adjust</h2>
-<p>When the demo is active, you will be able to:</p>
-<ul>
-<li>Select from the six CEC 2020 engineering benchmark problems (P1–P6)</li>
-<li>Adjust COO parameters (<span class="math inline">\(\tau\)</span>, <span class="math inline">\(\gamma\)</span>, <span class="math inline">\(N_{\max}\)</span>) with sliders and observe how they affect convergence behavior</li>
-<li>Toggle a side-by-side comparison with penalty gradient descent (PGD) on the same problem</li>
-<li>View the Luminosity Flux evolution alongside the primal trajectory</li>
-<li>Export the trajectory data as CSV for further analysis</li>
-</ul>
+<section id="the-two-phases-visual-guide" class="level2">
+<h2 class="anchored" data-anchor-id="the-two-phases-visual-guide">The Two Phases (Visual Guide)</h2>
+<p><strong>☀ Lumen phase</strong> — the gold dots are <span class="math inline">\(N_L\)</span> quasi-randomly sampled candidate points. The orange diamonds are the top <span class="math inline">\(\lfloor\lambda N_L\rfloor\)</span> beams selected by objective value — the high-luminosity regions of the feasible landscape. This is the <em>Exploration</em> layer.</p>
+<p><strong>◑ Ombra phase</strong> — the blue trajectory is projected gradient descent launched from the best Lumen beam. This is the <em>Exploitation</em> layer — precision convergence in the correct basin.</p>
+<p>The key insight: the Lumen phase costs <span class="math inline">\(N_L\)</span> function evaluations to select the correct starting point. Those evaluations are cheap because they require no gradient computation. The Ombra phase then spends gradient evaluations only where they matter.</p>
 </section>
-<section id="benchmark-problems-preview" class="level2">
-<h2 class="anchored" data-anchor-id="benchmark-problems-preview">Benchmark Problems (Preview)</h2>
+<section id="benchmark-problems-full-paper" class="level2">
+<h2 class="anchored" data-anchor-id="benchmark-problems-full-paper">Benchmark Problems (Full Paper)</h2>
 <table class="table">
 <thead>
 <tr class="header">
 <th>Code</th>
 <th>Problem</th>
-<th>Variables</th>
-<th>Constraints</th>
-<th>COO Success Rate</th>
+<th style="text-align: center;">Variables</th>
+<th style="text-align: center;">Constraints</th>
+<th style="text-align: center;">COO SR</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>P1</td>
 <td>Three-bar truss</td>
-<td>2</td>
-<td>3</td>
-<td>100%</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">100%</td>
 </tr>
 <tr class="even">
 <td>P2</td>
 <td>Pressure vessel</td>
-<td>4</td>
-<td>4</td>
-<td>100%</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">100%</td>
 </tr>
 <tr class="odd">
 <td>P3</td>
 <td>Welded beam</td>
-<td>4</td>
-<td>6</td>
-<td>20%</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">20%</td>
 </tr>
 <tr class="even">
 <td>P4</td>
 <td>Tension/compression spring</td>
-<td>3</td>
-<td>4</td>
-<td>20%</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">20%</td>
 </tr>
 <tr class="odd">
 <td>P5</td>
 <td>Speed reducer (11 constraints)</td>
-<td>7</td>
-<td>11</td>
-<td>100%</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">100%</td>
 </tr>
 <tr class="even">
 <td>P6</td>
 <td>Himmelblau’s function</td>
-<td>2</td>
-<td>6</td>
-<td>0% (parameter sensitivity)</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">0% (parameter sensitivity)</td>
 </tr>
 </tbody>
 </table>
-<p>Full results and analysis: <a href="../../projects/coo/results.html">Experimental Results →</a></p>
-<hr>
-<p><em>[Interactive content will appear here at publication. The demo notebook is being prepared alongside the paper submission.]</em></p>
+<p>Full benchmark analysis and honest failure discussion: <a href="../../projects/coo/results.html">Experimental Results →</a></p>
 
 
 </section>

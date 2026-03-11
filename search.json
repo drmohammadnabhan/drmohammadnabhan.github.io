@@ -270,28 +270,35 @@
     "href": "projects/coo/demo.html",
     "title": "Interactive Demo",
     "section": "",
-    "text": "Important\n\n\n\nThe interactive demo will be activated upon paper publication.\nThe demo runs entirely in your browser — no server, no installation, no account required. It uses marimo, a reactive Python notebook compiled to WebAssembly via Pyodide. There is no concurrency limit and no compute cost: the algorithm runs on your machine."
+    "text": "Note\n\n\n\nPre-publication preview. This demo uses simplified 2D test functions to illustrate the algorithm’s behaviour. The full benchmark suite (P1–P6) will be activated upon paper publication."
+  },
+  {
+    "objectID": "projects/coo/demo.html#try-it",
+    "href": "projects/coo/demo.html#try-it",
+    "title": "Interactive Demo",
+    "section": "Try It",
+    "text": "Try It\nUse the controls on the left to select a test problem and tune the algorithm parameters, then click Run COO to watch both phases unfold. Click Run Both to compare directly against vanilla gradient projection (PGD)."
   },
   {
     "objectID": "projects/coo/demo.html#what-the-demo-shows",
     "href": "projects/coo/demo.html#what-the-demo-shows",
     "title": "Interactive Demo",
     "section": "What the Demo Shows",
-    "text": "What the Demo Shows\nThe COO algorithm alternates between two phases that are visually distinct in the trajectory plot:\nLumen phase — the trajectory moves like a frictionless billiard ball inside the feasible region \\(\\Omega\\), bouncing off constraint boundaries with exact energy conservation. At each boundary contact, the Snell-KKT operator is applied and a KKT multiplier \\(\\lambda_i^{(j)}\\) is emitted and accumulated.\nOmbra phase — when the Adaptive Percentile Filter detects a low-energy state, the dissipative integrator fires. The trajectory converges exponentially to the local minimum (visible as a rapid spiral inward), then the Lumen resumes from the same state it left.\nThe Luminosity Flux panel shows the running average \\(\\bar{\\Lambda}_k\\) converging toward the true KKT multiplier \\(\\lambda^*\\) as boundary events accumulate — the dual certificate building up in real time."
+    "text": "What the Demo Shows\nThe demo runs three problems that expose COO’s core strength: reliably finding the global minimum on multimodal landscapes where gradient-only methods get trapped.\nStyblinski-Tang — four local minima in \\([-5,5]^2\\). The global minimum is at \\((-2.90, -2.90)\\), \\(f \\approx -78.33\\). PGD started from \\((2.5,\\,2.5)\\) converges to a local minimum at \\((2.75,\\,2.75)\\), \\(f \\approx -50\\). COO’s Lumen sweep identifies the correct basin; Ombra then converges to the global.\nRastrigin — approximately 50 local minima in \\([-5.12,5.12]^2\\), global minimum at the origin. PGD from \\((3.5,\\,3.5)\\) locks into the nearest local basin. The Lumen sweep disperses evaluations across the full domain and identifies the correct basin before refinement begins.\nHimmelblau — four equal global minima, all with \\(f=0\\). This problem highlights a different capability: Lumen illuminates all four basins simultaneously, making COO’s solution independent of starting point. PGD from any corner finds only the nearest minimum."
   },
   {
-    "objectID": "projects/coo/demo.html#what-you-will-be-able-to-adjust",
-    "href": "projects/coo/demo.html#what-you-will-be-able-to-adjust",
+    "objectID": "projects/coo/demo.html#the-two-phases-visual-guide",
+    "href": "projects/coo/demo.html#the-two-phases-visual-guide",
     "title": "Interactive Demo",
-    "section": "What You Will Be Able to Adjust",
-    "text": "What You Will Be Able to Adjust\nWhen the demo is active, you will be able to:\n\nSelect from the six CEC 2020 engineering benchmark problems (P1–P6)\nAdjust COO parameters (\\(\\tau\\), \\(\\gamma\\), \\(N_{\\max}\\)) with sliders and observe how they affect convergence behavior\nToggle a side-by-side comparison with penalty gradient descent (PGD) on the same problem\nView the Luminosity Flux evolution alongside the primal trajectory\nExport the trajectory data as CSV for further analysis"
+    "section": "The Two Phases (Visual Guide)",
+    "text": "The Two Phases (Visual Guide)\n☀ Lumen phase — the gold dots are \\(N_L\\) quasi-randomly sampled candidate points. The orange diamonds are the top \\(\\lfloor\\lambda N_L\\rfloor\\) beams selected by objective value — the high-luminosity regions of the feasible landscape. This is the Exploration layer.\n◑ Ombra phase — the blue trajectory is projected gradient descent launched from the best Lumen beam. This is the Exploitation layer — precision convergence in the correct basin.\nThe key insight: the Lumen phase costs \\(N_L\\) function evaluations to select the correct starting point. Those evaluations are cheap because they require no gradient computation. The Ombra phase then spends gradient evaluations only where they matter."
   },
   {
-    "objectID": "projects/coo/demo.html#benchmark-problems-preview",
-    "href": "projects/coo/demo.html#benchmark-problems-preview",
+    "objectID": "projects/coo/demo.html#benchmark-problems-full-paper",
+    "href": "projects/coo/demo.html#benchmark-problems-full-paper",
     "title": "Interactive Demo",
-    "section": "Benchmark Problems (Preview)",
-    "text": "Benchmark Problems (Preview)\n\n\n\nCode\nProblem\nVariables\nConstraints\nCOO Success Rate\n\n\n\n\nP1\nThree-bar truss\n2\n3\n100%\n\n\nP2\nPressure vessel\n4\n4\n100%\n\n\nP3\nWelded beam\n4\n6\n20%\n\n\nP4\nTension/compression spring\n3\n4\n20%\n\n\nP5\nSpeed reducer (11 constraints)\n7\n11\n100%\n\n\nP6\nHimmelblau’s function\n2\n6\n0% (parameter sensitivity)\n\n\n\nFull results and analysis: Experimental Results →\n\n[Interactive content will appear here at publication. The demo notebook is being prepared alongside the paper submission.]"
+    "section": "Benchmark Problems (Full Paper)",
+    "text": "Benchmark Problems (Full Paper)\n\n\n\nCode\nProblem\nVariables\nConstraints\nCOO SR\n\n\n\n\nP1\nThree-bar truss\n2\n3\n100%\n\n\nP2\nPressure vessel\n4\n4\n100%\n\n\nP3\nWelded beam\n4\n6\n20%\n\n\nP4\nTension/compression spring\n3\n4\n20%\n\n\nP5\nSpeed reducer (11 constraints)\n7\n11\n100%\n\n\nP6\nHimmelblau’s function\n2\n6\n0% (parameter sensitivity)\n\n\n\nFull benchmark analysis and honest failure discussion: Experimental Results →"
   },
   {
     "objectID": "about.html",

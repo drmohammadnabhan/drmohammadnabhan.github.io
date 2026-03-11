@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COO Interactive Demo</title>
+  <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #0d1117;
+      color: #e6edf3;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    #header {
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #161b22, #0d1117);
+      border-bottom: 1px solid #30363d;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    #header h1 {
+      font-size: 1.1rem;
+      color: #c9a227;
+      letter-spacing: 0.02em;
+    }
+    #header p {
+      font-size: 0.78rem;
+      color: #8b949e;
+      font-style: italic;
+    }
+
+    /* ── Main layout ─────────────────────────────── */
+    #layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 230px 1fr 230px;
+      overflow: hidden;
+    }
+
+    .panel {
+      padding: 1rem;
+      overflow-y: auto;
+      border-right: 1px solid #21262d;
+    }
+    .panel:last-child { border-right: none; }
+
+    .section-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #c9a227;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #21262d;
+    }
+
+    /* ── Controls ───────────────────────────────── */
+    #ctrl { background: #161b22; }
+
+    .ctrl-group { margin-bottom: 1.1rem; }
+
+    .ctrl-label {
+      font-size: 0.75rem;
+      color: #8b949e;
+      margin-bottom: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .ctrl-label .val { color: #c9a227; font-weight: bold; }
+
+    select {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 0.35rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    select:focus { outline: 1px solid #c9a227; }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #c9a227;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.55rem 0.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 0.4rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-gold  { background: #c9a227; color: #0d1117; font-weight: bold; }
+    .btn-gold:hover { background: #d4af37; }
+    .btn-ghost { background: transparent; border: 1px solid #30363d; color: #8b949e; }
+    .btn-ghost:hover { border-color: #c9a227; color: #c9a227; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #status {
+      margin-top: 0.8rem;
+      font-size: 0.73rem;
+      color: #8b949e;
+      font-style: italic;
+      min-height: 2.2rem;
+      line-height: 1.4;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      margin-bottom: 0.7rem;
+    }
+    .badge-idle   { background: rgba(139,148,158,.15); border: 1px solid #8b949e;  color: #8b949e; }
+    .badge-lumen  { background: rgba(201,162,39,.15);  border: 1px solid #c9a227;  color: #c9a227; }
+    .badge-ombra  { background: rgba(88,166,255,.15);  border: 1px solid #58a6ff;  color: #58a6ff; }
+    .badge-done   { background: rgba(63,185,80,.15);   border: 1px solid #3fb950;  color: #3fb950; }
+
+    .legend { margin-top: 0.8rem; }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-bottom: 0.3rem;
+    }
+    .dot  { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dash { width: 14px; height: 2px; flex-shrink: 0; }
+
+    /* ── Plot area ──────────────────────────────── */
+    #viz { background: #0d1117; padding: 0; }
+    #main-plot { width: 100%; height: 100%; }
+
+    /* ── Metrics ────────────────────────────────── */
+    #metrics { background: #161b22; }
+
+    .metric-card {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 5px;
+      padding: 0.75rem;
+      margin-bottom: 0.7rem;
+    }
+    .metric-card h4 {
+      font-size: 0.65rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+    .metric-val { font-size: 1.15rem; font-weight: bold; }
+    .metric-sub { font-size: 0.68rem; color: #8b949e; margin-top: 0.1rem; }
+
+    .gold   { color: #c9a227; }
+    .blue   { color: #58a6ff; }
+    .green  { color: #3fb950; }
+    .red    { color: #f85149; }
+    .muted  { color: #8b949e; }
+
+    table.cmp {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.73rem;
+    }
+    table.cmp th {
+      text-align: left;
+      color: #8b949e;
+      font-weight: normal;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #21262d;
+    }
+    table.cmp td {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #161b22;
+    }
+
+    #conv-plot { width: 100%; height: 160px; margin-top: 0.4rem; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <h1>Clair-Obscur Optimization (COO)</h1>
+  <p>Two-phase Lumen–Ombra algorithm — interactive visualisation</p>
+</div>
+
+<!-- Layout -->
+<div id="layout">
+
+  <!-- ── Controls ── -->
+  <div class="panel" id="ctrl">
+    <div class="section-title">Controls</div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">Test Problem</div>
+      <select id="prob-sel" onchange="onProblemChange()">
+        <option value="styblinski">Styblinski-Tang (multimodal)</option>
+        <option value="rastrigin">Rastrigin (highly multimodal)</option>
+        <option value="himmelblau">Himmelblau (4 global minima)</option>
+      </select>
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        Lumen samples (N<sub>L</sub>)
+        <span class="val" id="nl-lbl">200</span>
+      </div>
+      <input type="range" id="nl" min="50" max="500" value="200" step="10"
+        oninput="document.getElementById('nl-lbl').textContent=this.value">
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        Luminosity threshold (λ)
+        <span class="val" id="lam-lbl">0.12</span>
+      </div>
+      <input type="range" id="lam" min="0.03" max="0.40" value="0.12" step="0.01"
+        oninput="document.getElementById('lam-lbl').textContent=parseFloat(this.value).toFixed(2)">
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        Step size (α)
+        <span class="val" id="alpha-lbl">0.015</span>
+      </div>
+      <input type="range" id="alpha" min="0.001" max="0.08" value="0.015" step="0.001"
+        oninput="document.getElementById('alpha-lbl').textContent=parseFloat(this.value).toFixed(3)">
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        Max Ombra iterations
+        <span class="val" id="maxiter-lbl">300</span>
+      </div>
+      <input type="range" id="maxiter" min="50" max="800" value="300" step="50"
+        oninput="document.getElementById('maxiter-lbl').textContent=this.value">
+    </div>
+
+    <div style="margin-top:0.5rem">
+      <button class="btn btn-gold"  id="btn-coo"  onclick="runCOO()">▶ Run COO</button>
+      <button class="btn btn-ghost" id="btn-pgd"  onclick="runPGD()">Run PGD (baseline)</button>
+      <button class="btn btn-ghost" id="btn-both" onclick="runBoth()">Run Both</button>
+      <button class="btn btn-ghost"               onclick="resetAll()">↺ Reset</button>
+    </div>
+
+    <div id="status">Choose a problem and click Run COO.</div>
+
+    <div class="legend" style="margin-top:1rem;">
+      <div class="section-title" style="margin-top:0.5rem;">Legend</div>
+      <div class="legend-row"><div class="dot" style="background:rgba(201,162,39,.45)"></div> Lumen candidates</div>
+      <div class="legend-row"><div class="dot" style="background:#ff8c00"></div> Selected beams (top λ·N<sub>L</sub>)</div>
+      <div class="legend-row"><div class="dash" style="background:#58a6ff"></div> Ombra path (COO)</div>
+      <div class="legend-row"><div class="dot" style="background:#3fb950; width:11px;height:11px;"></div> COO solution</div>
+      <div class="legend-row"><div class="dash" style="background:#f85149; height:2px; background: repeating-linear-gradient(90deg,#f85149 0,#f85149 4px,transparent 4px,transparent 7px);"></div> PGD path</div>
+      <div class="legend-row"><div class="dot" style="background:#f85149"></div> PGD solution</div>
+      <div class="legend-row"><div class="dot" style="background:#fff; opacity:0.6"></div> Known global min</div>
+    </div>
+  </div>
+
+  <!-- ── Viz ── -->
+  <div class="panel" id="viz">
+    <div id="main-plot"></div>
+  </div>
+
+  <!-- ── Metrics ── -->
+  <div class="panel" id="metrics">
+    <div class="section-title">Results</div>
+
+    <div id="phase-badge" class="badge badge-idle">● Idle</div>
+
+    <div class="metric-card">
+      <h4>COO — best f(x*)</h4>
+      <div class="metric-val gold" id="coo-fval">—</div>
+      <div class="metric-sub" id="coo-loc">at (—, —)</div>
+    </div>
+
+    <div class="metric-card">
+      <h4>PGD — best f(x*)</h4>
+      <div class="metric-val blue" id="pgd-fval">—</div>
+      <div class="metric-sub" id="pgd-loc">at (—, —)</div>
+    </div>
+
+    <div class="metric-card">
+      <h4>Lumen evaluations</h4>
+      <div class="metric-val gold" id="lumen-evals">—</div>
+      <div class="metric-sub">function calls (sweep)</div>
+    </div>
+
+    <div style="margin-top:0.8rem;">
+      <div class="section-title">Convergence</div>
+      <div id="conv-plot"></div>
+    </div>
+
+    <div style="margin-top:0.8rem;">
+      <div class="section-title">Head-to-Head</div>
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="gold">COO</th>
+            <th class="blue">PGD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="muted">f(x*)</td>
+            <td class="gold" id="cmp-coo-f">—</td>
+            <td class="blue" id="cmp-pgd-f">—</td>
+          </tr>
+          <tr>
+            <td class="muted">F-evals</td>
+            <td class="gold" id="cmp-coo-ev">—</td>
+            <td class="blue" id="cmp-pgd-ev">—</td>
+          </tr>
+          <tr>
+            <td class="muted">Iters</td>
+            <td class="gold" id="cmp-coo-it">—</td>
+            <td class="blue" id="cmp-pgd-it">—</td>
+          </tr>
+          <tr>
+            <td class="muted">Global opt?</td>
+            <td id="cmp-coo-g">—</td>
+            <td id="cmp-pgd-g">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// PROBLEM LIBRARY
+// ══════════════════════════════════════════════════════════════════
+const P = {
+
+  styblinski: {
+    name: 'Styblinski-Tang',
+    bounds: [[-5, 5], [-5, 5]],
+    f:  (x,y) => ((x**4 - 16*x**2 + 5*x) + (y**4 - 16*y**2 + 5*y)) / 2,
+    gx: (x,y) => (4*x**3 - 32*x + 5) / 2,
+    gy: (x,y) => (4*y**3 - 32*y + 5) / 2,
+    globalMins: [{ x: -2.9035, y: -2.9035, f: -78.332 }],
+    pgdStart: [2.5, 2.5],
+    desc: 'Global min ≈ −78.33 at (−2.90,−2.90). PGD from (2.5,2.5) traps in local min ≈ −50.'
+  },
+
+  rastrigin: {
+    name: 'Rastrigin',
+    bounds: [[-5.12, 5.12], [-5.12, 5.12]],
+    f:  (x,y) => 20 + x**2 - 10*Math.cos(2*Math.PI*x) + y**2 - 10*Math.cos(2*Math.PI*y),
+    gx: (x,y) => 2*x + 20*Math.PI*Math.sin(2*Math.PI*x),
+    gy: (x,y) => 2*y + 20*Math.PI*Math.sin(2*Math.PI*y),
+    globalMins: [{ x: 0, y: 0, f: 0 }],
+    pgdStart: [3.5, 3.5],
+    desc: 'Global min = 0 at origin. ~50 local minima in domain. PGD from (3.5,3.5) gets trapped.'
+  },
+
+  himmelblau: {
+    name: "Himmelblau",
+    bounds: [[-5, 5], [-5, 5]],
+    f:  (x,y) => (x**2+y-11)**2 + (x+y**2-7)**2,
+    gx: (x,y) => 4*x*(x**2+y-11) + 2*(x+y**2-7),
+    gy: (x,y) => 2*(x**2+y-11) + 4*y*(x+y**2-7),
+    globalMins: [
+      { x:  3.000, y:  2.000,  f: 0 },
+      { x: -2.805, y:  3.131,  f: 0 },
+      { x: -3.779, y: -3.283,  f: 0 },
+      { x:  3.584, y: -1.848,  f: 0 }
+    ],
+    pgdStart: [4.5, 4.5],
+    desc: '4 equal global minima (f=0). Lumen identifies all basins; PGD from (4.5,4.5) finds only one.'
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// NUMERICAL UTILITIES
+// ══════════════════════════════════════════════════════════════════
+
+function halton(idx, base) {
+  let f = 1, r = 0, i = idx;
+  while (i > 0) { f /= base; r += f * (i % base); i = Math.floor(i/base); }
+  return r;
+}
+
+function clip(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function projectPt(x, y, bounds) {
+  return [clip(x, bounds[0][0], bounds[0][1]),
+          clip(y, bounds[1][0], bounds[1][1])];
+}
+
+// Projected gradient descent with backtracking line search
+function pgd(prob, x0, y0, alpha0, maxIter) {
+  let x = x0, y = y0;
+  const path = [[x, y]], vals = [prob.f(x, y)];
+  for (let i = 0; i < maxIter; i++) {
+    const gx = prob.gx(x, y), gy = prob.gy(x, y);
+    const gnorm2 = gx*gx + gy*gy;
+    if (gnorm2 < 1e-14) break;
+
+    // Backtracking
+    let a = alpha0;
+    let nx, ny;
+    for (let k = 0; k < 30; k++) {
+      [nx, ny] = projectPt(x - a*gx, y - a*gy, prob.bounds);
+      if (prob.f(nx, ny) <= prob.f(x, y) - 0.0001*a*gnorm2) break;
+      a *= 0.5;
+    }
+    if (Math.hypot(nx-x, ny-y) < 1e-9) break;
+    x = nx; y = ny;
+    path.push([x, y]);
+    vals.push(prob.f(x, y));
+  }
+  return { path, vals, fx: x, fy: y, fv: prob.f(x, y) };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LUMEN PHASE
+// ══════════════════════════════════════════════════════════════════
+function lumenPhase(prob, NL, lam) {
+  const [[x0,x1],[y0,y1]] = prob.bounds;
+  const cands = [];
+  for (let i = 1; i <= NL; i++) {
+    const x = x0 + (x1-x0) * halton(i, 2);
+    const y = y0 + (y1-y0) * halton(i, 3);
+    cands.push({ x, y, fv: prob.f(x, y) });
+  }
+  cands.sort((a,b) => a.fv - b.fv);
+  const K = Math.max(1, Math.ceil(NL * lam));
+  return { cands, beams: cands.slice(0, K) };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+let ST = { lumen: null, coo: null, pgdR: null, busy: false };
+
+function prob() { return P[document.getElementById('prob-sel').value]; }
+function params() {
+  return {
+    NL:      +document.getElementById('nl').value,
+    lam:     +document.getElementById('lam').value,
+    alpha:   +document.getElementById('alpha').value,
+    maxIter: +document.getElementById('maxiter').value
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PLOT HELPERS
+// ══════════════════════════════════════════════════════════════════
+const LAYOUT_BASE = {
+  paper_bgcolor: '#0d1117',
+  plot_bgcolor:  '#0d1117',
+  margin: { l:45, r:10, t:10, b:45 },
+  showlegend: false,
+  autosize: true,
+  xaxis: { title:{text:'x₁',font:{color:'#8b949e',size:11}}, color:'#8b949e',
+           gridcolor:'#21262d', zerolinecolor:'#30363d', tickfont:{size:9,color:'#8b949e'} },
+  yaxis: { title:{text:'x₂',font:{color:'#8b949e',size:11}}, color:'#8b949e',
+           gridcolor:'#21262d', zerolinecolor:'#30363d', tickfont:{size:9,color:'#8b949e'} }
+};
+
+function layout(bounds) {
+  return Object.assign({}, LAYOUT_BASE, {
+    xaxis: Object.assign({}, LAYOUT_BASE.xaxis, { range: bounds[0] }),
+    yaxis: Object.assign({}, LAYOUT_BASE.yaxis, { range: bounds[1] })
+  });
+}
+
+function contourTrace(pr) {
+  const N = 120;
+  const [[x0,x1],[y0,y1]] = pr.bounds;
+  const xs = Array.from({length:N}, (_,i) => x0 + (x1-x0)*i/(N-1));
+  const ys = Array.from({length:N}, (_,i) => y0 + (y1-y0)*i/(N-1));
+  const z  = ys.map(y => xs.map(x => pr.f(x,y)));
+  return {
+    x:xs, y:ys, z:z, type:'contour',
+    colorscale:'Viridis', reversescale:true, showscale:false,
+    contours:{ coloring:'fill', showlines:true },
+    line:{ width:0.4, color:'rgba(255,255,255,0.12)' },
+    hovertemplate:'x: %{x:.2f}<br>y: %{y:.2f}<br>f: %{z:.3f}<extra></extra>'
+  };
+}
+
+function globalMinMarkers(pr) {
+  return {
+    x: pr.globalMins.map(m=>m.x),
+    y: pr.globalMins.map(m=>m.y),
+    mode:'markers', type:'scatter',
+    marker:{ color:'rgba(255,255,255,0.7)', size:10, symbol:'cross',
+             line:{color:'white',width:1.5} },
+    hovertemplate:'Known global min<br>x: %{x:.3f}<br>y: %{y:.3f}<extra></extra>'
+  };
+}
+
+function buildTraces(pr, lumenData, cooData, pgdData) {
+  const traces = [contourTrace(pr), globalMinMarkers(pr)];
+
+  if (lumenData) {
+    const {cands, beams} = lumenData;
+    traces.push({
+      x:cands.map(c=>c.x), y:cands.map(c=>c.y),
+      mode:'markers', type:'scatter',
+      marker:{color:'rgba(201,162,39,0.3)', size:3.5},
+      hovertemplate:'Lumen candidate<br>f: %{text:.3f}<extra></extra>',
+      text:cands.map(c=>c.fv)
+    });
+    traces.push({
+      x:beams.map(b=>b.x), y:beams.map(b=>b.y),
+      mode:'markers', type:'scatter',
+      marker:{color:'#ff8c00', size:8, symbol:'circle',
+              line:{color:'rgba(255,255,255,0.6)',width:1}},
+      hovertemplate:'Lumen beam<br>x: %{x:.3f}<br>y: %{y:.3f}<br>f: %{text:.3f}<extra></extra>',
+      text:beams.map(b=>b.fv)
+    });
+  }
+
+  if (cooData) {
+    traces.push({
+      x:cooData.path.map(p=>p[0]), y:cooData.path.map(p=>p[1]),
+      mode:'lines', type:'scatter',
+      line:{color:'#58a6ff', width:1.8},
+      hovertemplate:'COO (Ombra)<extra></extra>'
+    });
+    traces.push({
+      x:[cooData.fx], y:[cooData.fy],
+      mode:'markers', type:'scatter',
+      marker:{color:'#3fb950', size:14, symbol:'star',
+              line:{color:'white',width:1.5}},
+      hovertemplate:`COO solution<br>x: ${cooData.fx.toFixed(4)}<br>y: ${cooData.fy.toFixed(4)}<br>f: ${cooData.fv.toFixed(4)}<extra></extra>`
+    });
+  }
+
+  if (pgdData) {
+    traces.push({
+      x:pgdData.path.map(p=>p[0]), y:pgdData.path.map(p=>p[1]),
+      mode:'lines', type:'scatter',
+      line:{color:'#f85149', width:1.8, dash:'dot'},
+      hovertemplate:'PGD<extra></extra>'
+    });
+    traces.push({
+      x:[pgdData.fx], y:[pgdData.fy],
+      mode:'markers', type:'scatter',
+      marker:{color:'#f85149', size:12, symbol:'square',
+              line:{color:'white',width:1.5}},
+      hovertemplate:`PGD solution<br>x: ${pgdData.fx.toFixed(4)}<br>y: ${pgdData.fy.toFixed(4)}<br>f: ${pgdData.fv.toFixed(4)}<extra></extra>`
+    });
+    // Start marker
+    const [sx, sy] = prob().pgdStart;
+    traces.push({
+      x:[sx], y:[sy],
+      mode:'markers', type:'scatter',
+      marker:{color:'#f85149', size:9, symbol:'x',
+              line:{color:'white',width:1.5}},
+      hovertemplate:`PGD start (${sx}, ${sy})<extra></extra>`
+    });
+  }
+
+  return traces;
+}
+
+function redraw() {
+  const pr = prob();
+  Plotly.react('main-plot',
+    buildTraces(pr, ST.lumen, ST.coo, ST.pgdR),
+    layout(pr.bounds),
+    {responsive:true, displayModeBar:false}
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONVERGENCE PLOT
+// ══════════════════════════════════════════════════════════════════
+function drawConv() {
+  const traces = [];
+  if (ST.coo) traces.push({
+    x: ST.coo.vals.map((_,i)=>i), y: ST.coo.vals,
+    mode:'lines', name:'COO', line:{color:'#58a6ff',width:2}
+  });
+  if (ST.pgdR) traces.push({
+    x: ST.pgdR.vals.map((_,i)=>i), y: ST.pgdR.vals,
+    mode:'lines', name:'PGD', line:{color:'#f85149',width:2,dash:'dot'}
+  });
+  if (!traces.length) return;
+  Plotly.react('conv-plot', traces, {
+    paper_bgcolor:'#0d1117', plot_bgcolor:'#0d1117',
+    height:160, margin:{l:40,r:5,t:5,b:30},
+    showlegend:true,
+    legend:{font:{size:9,color:'#8b949e'}, bgcolor:'transparent'},
+    xaxis:{title:{text:'Iteration',font:{color:'#8b949e',size:9}},
+           color:'#8b949e', gridcolor:'#21262d',
+           tickfont:{size:8,color:'#8b949e'}},
+    yaxis:{title:{text:'f(x)',font:{color:'#8b949e',size:9}},
+           color:'#8b949e', gridcolor:'#21262d',
+           tickfont:{size:8,color:'#8b949e'}}
+  }, {responsive:true, displayModeBar:false});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function badge(type, txt) {
+  const el = document.getElementById('phase-badge');
+  el.className = 'badge badge-' + type;
+  el.textContent = txt;
+}
+
+function status(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+function isNearGlobal(pr, x, y, tol=0.3) {
+  return pr.globalMins.some(m => Math.hypot(x-m.x, y-m.y) < tol);
+}
+
+function globalTick(ok) {
+  return ok ? '<span class="green">✓ Yes</span>' : '<span class="red">✗ Local</span>';
+}
+
+function updateCOOPanel(pr, r) {
+  document.getElementById('coo-fval').textContent = r.fv.toFixed(4);
+  document.getElementById('coo-loc').textContent  = `at (${r.fx.toFixed(3)}, ${r.fy.toFixed(3)})`;
+  const NL = +document.getElementById('nl').value;
+  document.getElementById('cmp-coo-f').textContent  = r.fv.toFixed(4);
+  document.getElementById('cmp-coo-ev').textContent = NL + r.path.length;
+  document.getElementById('cmp-coo-it').textContent = r.path.length;
+  document.getElementById('cmp-coo-g').innerHTML    = globalTick(isNearGlobal(pr, r.fx, r.fy));
+  document.getElementById('lumen-evals').textContent = NL;
+}
+
+function updatePGDPanel(pr, r) {
+  document.getElementById('pgd-fval').textContent = r.fv.toFixed(4);
+  document.getElementById('pgd-loc').textContent  = `at (${r.fx.toFixed(3)}, ${r.fy.toFixed(3)})`;
+  document.getElementById('cmp-pgd-f').textContent  = r.fv.toFixed(4);
+  document.getElementById('cmp-pgd-ev').textContent = r.path.length;
+  document.getElementById('cmp-pgd-it').textContent = r.path.length;
+  document.getElementById('cmp-pgd-g').innerHTML    = globalTick(isNearGlobal(pr, r.fx, r.fy));
+}
+
+function lock(on) {
+  ST.busy = on;
+  ['btn-coo','btn-pgd','btn-both'].forEach(id =>
+    document.getElementById(id).disabled = on);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ══════════════════════════════════════════════════════════════════
+// RUN FUNCTIONS
+// ══════════════════════════════════════════════════════════════════
+async function runCOO() {
+  if (ST.busy) return;
+  const pr = prob();
+  const { NL, lam, alpha, maxIter } = params();
+  lock(true);
+
+  // — Lumen phase
+  badge('lumen', '☀ Lumen phase');
+  status('Scanning feasible region — ' + NL + ' candidate points…');
+  await sleep(30);
+
+  ST.lumen = lumenPhase(pr, NL, lam);
+  redraw();
+  await sleep(600);
+
+  // — Ombra phase
+  badge('ombra', '◑ Ombra phase');
+  const beam = ST.lumen.beams[0];
+  status('Refining from best Lumen beam at (' + beam.x.toFixed(2) + ', ' + beam.y.toFixed(2) + ')…');
+  await sleep(30);
+
+  ST.coo = pgd(pr, beam.x, beam.y, alpha, maxIter);
+  redraw();
+  drawConv();
+  updateCOOPanel(pr, ST.coo);
+
+  badge('done', '✓ Complete');
+  status('COO → f(x*) = ' + ST.coo.fv.toFixed(4) +
+    ' at (' + ST.coo.fx.toFixed(3) + ', ' + ST.coo.fy.toFixed(3) + ')');
+  lock(false);
+}
+
+async function runPGD() {
+  if (ST.busy) return;
+  const pr = prob();
+  const { alpha, maxIter } = params();
+  lock(true);
+
+  badge('idle', '● Running PGD…');
+  const [sx, sy] = pr.pgdStart;
+  status('PGD from (' + sx + ', ' + sy + ')…');
+  await sleep(30);
+
+  ST.pgdR = pgd(pr, sx, sy, alpha, maxIter);
+  redraw();
+  drawConv();
+  updatePGDPanel(pr, ST.pgdR);
+
+  badge('done', '✓ Complete');
+  status('PGD → f(x*) = ' + ST.pgdR.fv.toFixed(4) +
+    ' at (' + ST.pgdR.fx.toFixed(3) + ', ' + ST.pgdR.fy.toFixed(3) + ')');
+  lock(false);
+}
+
+async function runBoth() {
+  if (ST.busy) return;
+  await runCOO();
+  await sleep(300);
+  await runPGD();
+}
+
+function resetAll() {
+  ST = { lumen:null, coo:null, pgdR:null, busy:false };
+  lock(false);
+  badge('idle', '● Idle');
+  status('Choose a problem and click Run COO.');
+  ['coo-fval','coo-loc','pgd-fval','pgd-loc','lumen-evals',
+   'cmp-coo-f','cmp-pgd-f','cmp-coo-ev','cmp-pgd-ev',
+   'cmp-coo-it','cmp-pgd-it'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+  ['cmp-coo-g','cmp-pgd-g'].forEach(id => {
+    document.getElementById(id).innerHTML = '—';
+  });
+  Plotly.purge('conv-plot');
+  initPlot();
+}
+
+function onProblemChange() {
+  resetAll();
+  document.getElementById('status').textContent =
+    prob().desc;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+function initPlot() {
+  const pr = prob();
+  Plotly.newPlot('main-plot',
+    [contourTrace(pr), globalMinMarkers(pr)],
+    layout(pr.bounds),
+    {responsive:true, displayModeBar:false}
+  );
+}
+
+window.addEventListener('resize', () => {
+  Plotly.Plots.resize('main-plot');
+  Plotly.Plots.resize('conv-plot');
+});
+
+initPlot();
+status(prob().desc);
+</script>
+</body>
+</html>
