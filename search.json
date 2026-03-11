@@ -1,0 +1,310 @@
+[
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html",
+    "href": "SETUP_INSTRUCTIONS.html",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Estimated time: 15 minutes. You only do this once. After this, all future publishing is automatic.\n\n\n\nTwo GitHub repos: 1. research-hub (private) — contains everything in this folder: source .qmd files, configs, the GitHub Actions workflow. This stays private indefinitely — your drafts live here. 2. drmohammadnabhan.github.io (public) — receives only the built HTML output. This is what visitors see at https://drmohammadnabhan.github.io. Before publication, it shows a minimal landing page. At publication, one push deploys the full site automatically.\nA GitHub Personal Access Token (PAT) acts as a secure key that lets the private repo push its built output to the public repo. You create it once and store it as a secret.\n\n\n\n\n\nGo to github.com/new\nRepository name: research-hub\nVisibility: Private ← important\nDo NOT check “Add a README file” (leave everything unchecked)\nClick “Create repository”\n\nLeave this page open — you’ll need the URL in Step 5.\n\n\n\n\n\nGo to github.com/new\nRepository name: drmohammadnabhan.github.io (must be exactly this)\nVisibility: Public ← must be public for GitHub Pages\nCheck “Add a README file” (so the main branch exists from the start)\nClick “Create repository”\n\nThen enable Pages on this repo: 1. In the new repo, click “Settings” (top menu) 2. In the left sidebar, click “Pages” 3. Under “Source”, select “Deploy from a branch” 4. Branch: main / / (root) 5. Click “Save”\n\n\n\n\nThis is the secure key that lets research-hub push to drmohammadnabhan.github.io.\n\nGo to github.com/settings/tokens (or: GitHub → Your profile icon → Settings → Developer settings → Personal access tokens → Tokens (classic))\nClick “Generate new token (classic)”\nNote: research-hub-deploy\nExpiration: No expiration (or 1 year — your preference)\nScopes: Check the box next to repo (this selects all repo sub-permissions)\nScroll down and click “Generate token”\n⚠️ Copy the token immediately — it will not be shown again. Paste it somewhere temporarily (Notes, TextEdit) while you complete the next step.\n\n\n\n\n\n\nGo to github.com/drmohammadnabhan/research-hub\nClick “Settings” (top menu)\nLeft sidebar: “Secrets and variables” → “Actions”\nClick “New repository secret”\nName: DEPLOY_TOKEN (exactly this, all caps)\nSecret: paste the token you copied in Step 3\nClick “Add secret”\n\nYou can now delete the temporary copy of the token from Notes/TextEdit.\n\n\n\n\nOpen Terminal on your Mac:\n# Navigate to this folder\n# (Replace the path below with the actual path to your Nabsidian vault —\n#  right-click the Research_Hub folder in Finder → \"Get Info\" to find it,\n#  or drag the folder into Terminal after typing \"cd \")\ncd \"/path/to/your/Nabsidian 2026/Research_Hub\"\n\n# Initialize git\ngit init\ngit branch -M main\n\n# Connect to the private repo\ngit remote add origin https://github.com/drmohammadnabhan/research-hub.git\n\n# Stage everything and make the first commit\ngit add .\ngit commit -m \"Initial Research Hub setup\"\n\n# Push — this triggers the first GitHub Actions build\ngit push -u origin main\nWhen prompted for credentials: enter your GitHub username (drmohammadnabhan) and use your PAT (the token from Step 3) as the password. GitHub no longer accepts account passwords for git push — the PAT is the correct credential.\nTo avoid being prompted every time, run this once after the push:\ngit config credential.helper osxkeychain\nmacOS will store the credential securely in Keychain and you will not be prompted again.\n\n\n\n\n\nGo to github.com/drmohammadnabhan/research-hub/actions\nYou should see a workflow run called “Build and Deploy Research Hub” in progress\nIt takes approximately 2–3 minutes (installs Quarto + Python, builds the site, pushes HTML)\nWhen it shows a green ✓, go to drmohammadnabhan.github.io\nYour research site is live\n\nIf the workflow shows a red ✗, click on it to see the error log. The most common issues are: wrong secret name (must be DEPLOY_TOKEN), wrong repo name in deploy.yml, or Pages not enabled on the public repo.\n\n\n\n\nEvery future update is exactly three commands from the Research_Hub/ folder:\ncd \"/path/to/Nabsidian 2026/Research_Hub\"\ngit add .\ngit commit -m \"describe what you changed\"\ngit push\nGitHub Actions does the rest automatically. The site updates in ~3 minutes.\nFor pre-publication: the site is visible at your GitHub Pages URL, but since most of your research pages have “Under Review” notices and no raw research data, this is acceptable public presence. If you want the site completely hidden until publication, temporarily replace index.qmd with a “Coming Soon” placeholder — a future Claude session can manage this.\nAt publication: update the badge-preprint to badge-published, add the DOI to the citation blocks, activate the demo page, push once. Done.\n\n\n\n\nWhen starting a session to update the Research Hub:\n\n“Update the Research Hub for the COO project. [Describe what to add/change.]”\n\nClaude will edit the relevant .qmd files in Research_Hub/projects/coo/. You then run the three git commands above. Claude does not push to git — you review and push manually, keeping you in control of what goes public.\n\n\n\n\n\n\n\n\n\n\n\n\nProblem\nLikely cause\nFix\n\n\n\n\nWorkflow fails: Error: Resource not accessible by integration\nWrong PAT scope or wrong secret name\nRegenerate PAT with repo scope; check secret is named DEPLOY_TOKEN\n\n\nWorkflow fails: remote: Repository not found\nRepo name mismatch in deploy.yml\nCheck external_repository: drmohammadnabhan/drmohammadnabhan.github.io matches exactly\n\n\nPages shows “404”\nPages not enabled or branch not set\nRepeat Step 2 Pages configuration\n\n\nMath not rendering\nMathJax CDN blocked\nReload page; check browser console\n\n\nPush asks for password every time\nKeychain not configured\nRun git config credential.helper osxkeychain"
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#what-you-are-setting-up",
+    "href": "SETUP_INSTRUCTIONS.html#what-you-are-setting-up",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Two GitHub repos: 1. research-hub (private) — contains everything in this folder: source .qmd files, configs, the GitHub Actions workflow. This stays private indefinitely — your drafts live here. 2. drmohammadnabhan.github.io (public) — receives only the built HTML output. This is what visitors see at https://drmohammadnabhan.github.io. Before publication, it shows a minimal landing page. At publication, one push deploys the full site automatically.\nA GitHub Personal Access Token (PAT) acts as a secure key that lets the private repo push its built output to the public repo. You create it once and store it as a secret."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-1-create-the-research-hub-private-repo",
+    "href": "SETUP_INSTRUCTIONS.html#step-1-create-the-research-hub-private-repo",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Go to github.com/new\nRepository name: research-hub\nVisibility: Private ← important\nDo NOT check “Add a README file” (leave everything unchecked)\nClick “Create repository”\n\nLeave this page open — you’ll need the URL in Step 5."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-2-create-the-drmohammadnabhan.github.io-public-repo",
+    "href": "SETUP_INSTRUCTIONS.html#step-2-create-the-drmohammadnabhan.github.io-public-repo",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Go to github.com/new\nRepository name: drmohammadnabhan.github.io (must be exactly this)\nVisibility: Public ← must be public for GitHub Pages\nCheck “Add a README file” (so the main branch exists from the start)\nClick “Create repository”\n\nThen enable Pages on this repo: 1. In the new repo, click “Settings” (top menu) 2. In the left sidebar, click “Pages” 3. Under “Source”, select “Deploy from a branch” 4. Branch: main / / (root) 5. Click “Save”"
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-3-create-a-personal-access-token-pat",
+    "href": "SETUP_INSTRUCTIONS.html#step-3-create-a-personal-access-token-pat",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "This is the secure key that lets research-hub push to drmohammadnabhan.github.io.\n\nGo to github.com/settings/tokens (or: GitHub → Your profile icon → Settings → Developer settings → Personal access tokens → Tokens (classic))\nClick “Generate new token (classic)”\nNote: research-hub-deploy\nExpiration: No expiration (or 1 year — your preference)\nScopes: Check the box next to repo (this selects all repo sub-permissions)\nScroll down and click “Generate token”\n⚠️ Copy the token immediately — it will not be shown again. Paste it somewhere temporarily (Notes, TextEdit) while you complete the next step."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-4-add-the-pat-as-a-secret-in-research-hub",
+    "href": "SETUP_INSTRUCTIONS.html#step-4-add-the-pat-as-a-secret-in-research-hub",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Go to github.com/drmohammadnabhan/research-hub\nClick “Settings” (top menu)\nLeft sidebar: “Secrets and variables” → “Actions”\nClick “New repository secret”\nName: DEPLOY_TOKEN (exactly this, all caps)\nSecret: paste the token you copied in Step 3\nClick “Add secret”\n\nYou can now delete the temporary copy of the token from Notes/TextEdit."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-5-initialize-git-in-this-folder-and-push",
+    "href": "SETUP_INSTRUCTIONS.html#step-5-initialize-git-in-this-folder-and-push",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Open Terminal on your Mac:\n# Navigate to this folder\n# (Replace the path below with the actual path to your Nabsidian vault —\n#  right-click the Research_Hub folder in Finder → \"Get Info\" to find it,\n#  or drag the folder into Terminal after typing \"cd \")\ncd \"/path/to/your/Nabsidian 2026/Research_Hub\"\n\n# Initialize git\ngit init\ngit branch -M main\n\n# Connect to the private repo\ngit remote add origin https://github.com/drmohammadnabhan/research-hub.git\n\n# Stage everything and make the first commit\ngit add .\ngit commit -m \"Initial Research Hub setup\"\n\n# Push — this triggers the first GitHub Actions build\ngit push -u origin main\nWhen prompted for credentials: enter your GitHub username (drmohammadnabhan) and use your PAT (the token from Step 3) as the password. GitHub no longer accepts account passwords for git push — the PAT is the correct credential.\nTo avoid being prompted every time, run this once after the push:\ngit config credential.helper osxkeychain\nmacOS will store the credential securely in Keychain and you will not be prompted again."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#step-6-watch-the-first-deployment",
+    "href": "SETUP_INSTRUCTIONS.html#step-6-watch-the-first-deployment",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Go to github.com/drmohammadnabhan/research-hub/actions\nYou should see a workflow run called “Build and Deploy Research Hub” in progress\nIt takes approximately 2–3 minutes (installs Quarto + Python, builds the site, pushes HTML)\nWhen it shows a green ✓, go to drmohammadnabhan.github.io\nYour research site is live\n\nIf the workflow shows a red ✗, click on it to see the error log. The most common issues are: wrong secret name (must be DEPLOY_TOKEN), wrong repo name in deploy.yml, or Pages not enabled on the public repo."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#after-setup-normal-publishing-workflow",
+    "href": "SETUP_INSTRUCTIONS.html#after-setup-normal-publishing-workflow",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Every future update is exactly three commands from the Research_Hub/ folder:\ncd \"/path/to/Nabsidian 2026/Research_Hub\"\ngit add .\ngit commit -m \"describe what you changed\"\ngit push\nGitHub Actions does the rest automatically. The site updates in ~3 minutes.\nFor pre-publication: the site is visible at your GitHub Pages URL, but since most of your research pages have “Under Review” notices and no raw research data, this is acceptable public presence. If you want the site completely hidden until publication, temporarily replace index.qmd with a “Coming Soon” placeholder — a future Claude session can manage this.\nAt publication: update the badge-preprint to badge-published, add the DOI to the citation blocks, activate the demo page, push once. Done."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#ongoing-workflow-what-claude-handles",
+    "href": "SETUP_INSTRUCTIONS.html#ongoing-workflow-what-claude-handles",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "When starting a session to update the Research Hub:\n\n“Update the Research Hub for the COO project. [Describe what to add/change.]”\n\nClaude will edit the relevant .qmd files in Research_Hub/projects/coo/. You then run the three git commands above. Claude does not push to git — you review and push manually, keeping you in control of what goes public."
+  },
+  {
+    "objectID": "SETUP_INSTRUCTIONS.html#troubleshooting-quick-reference",
+    "href": "SETUP_INSTRUCTIONS.html#troubleshooting-quick-reference",
+    "title": "Research Hub — One-Time GitHub Setup",
+    "section": "",
+    "text": "Problem\nLikely cause\nFix\n\n\n\n\nWorkflow fails: Error: Resource not accessible by integration\nWrong PAT scope or wrong secret name\nRegenerate PAT with repo scope; check secret is named DEPLOY_TOKEN\n\n\nWorkflow fails: remote: Repository not found\nRepo name mismatch in deploy.yml\nCheck external_repository: drmohammadnabhan/drmohammadnabhan.github.io matches exactly\n\n\nPages shows “404”\nPages not enabled or branch not set\nRepeat Step 2 Pages configuration\n\n\nMath not rendering\nMathJax CDN blocked\nReload page; check browser console\n\n\nPush asks for password every time\nKeychain not configured\nRun git config credential.helper osxkeychain"
+  },
+  {
+    "objectID": "projects/coo/results.html",
+    "href": "projects/coo/results.html",
+    "title": "Experimental Results",
+    "section": "",
+    "text": "Note\n\n\n\nStatus: Full results tables and raw data will be released upon paper acceptance. This page summarizes the key findings."
+  },
+  {
+    "objectID": "projects/coo/results.html#benchmark-setup",
+    "href": "projects/coo/results.html#benchmark-setup",
+    "title": "Experimental Results",
+    "section": "Benchmark Setup",
+    "text": "Benchmark Setup\nCOO was evaluated on six real-world engineering design problems from the CEC 2020 Real-World Constrained Optimization Benchmark (Kumar et al., 2020). Each method was run five times from independent random feasible starting points. All methods used the same Phase-1 feasibility restoration before the main optimization, ensuring the comparison focuses on optimization performance rather than feasibility-finding.\nComparison methods:\n\nCOO — this work\nPGD — Penalty Gradient Descent using L-BFGS-B on the penalty-augmented objective \\(f(x) + \\rho\\sum_i \\max(0, G_i(x))^2\\)\nPSO — Particle Swarm Optimization with 30 particles\n\nMetrics:\n\nSuccess Rate (SR): fraction of 5 runs achieving \\(f \\leq f_{\\text{ref}}(1 + 0.01)\\) with feasibility — within 1% of the reference optimum\nMean Gap: \\(\\overline{(f - f_{\\text{ref}})/|f_{\\text{ref}}|}\\) across 5 runs\nGradient evaluations: total gradient calls used"
+  },
+  {
+    "objectID": "projects/coo/results.html#benchmark-problems",
+    "href": "projects/coo/results.html#benchmark-problems",
+    "title": "Experimental Results",
+    "section": "Benchmark Problems",
+    "text": "Benchmark Problems\n\n\n\nCode\nProblem\nVariables\nConstraints\nCharacter\n\n\n\n\nP1\nThree-bar truss design\n2\n3\nWell-conditioned, simple\n\n\nP2\nPressure vessel design\n4\n4\nStandard engineering design\n\n\nP3\nWelded beam design\n4\n6\nNarrow feasible valley\n\n\nP4\nTension/compression spring\n3\n4\nNarrow feasible valley\n\n\nP5\nSpeed reducer (gearbox)\n7\n11\nMulti-constraint, complex\n\n\nP6\nHimmelblau’s function\n2\n6\nTight absolute threshold"
+  },
+  {
+    "objectID": "projects/coo/results.html#key-findings",
+    "href": "projects/coo/results.html#key-findings",
+    "title": "Experimental Results",
+    "section": "Key Findings",
+    "text": "Key Findings\n\nP1 — Three-bar truss: efficiency advantage\nAll three methods achieve SR = 100%. COO uses approximately 1,500 gradient evaluations; PGD requires approximately 30,000. COO is ~20× more gradient-efficient at equal accuracy. For problems where gradient evaluations are cheap, this difference is minor. For simulation-backed design where each gradient call involves a finite-element solve or CFD run, the 20× difference is the entire budget.\n\n\nP5 — Speed reducer: the flagship result\n\n\n\n\n\n\nTip\n\n\n\nCOO: SR = 100%. PGD: SR = 0%. Penalty gradient descent fails on all five runs.\n\n\nThe 11-constraint speed reducer is the most complex benchmark in the set. Penalty gradient descent aggregates all 11 constraints into a single combined penalty term — the resulting landscape is highly non-convex and riddled with local optima that trap L-BFGS-B. COO’s sequential Snell-KKT reflections handle each constraint boundary as an independent geometric event, decomposing the multi-constraint surface naturally and generating shadow prices for each constraint individually.\nPSO also achieves SR = 100% but uses no gradient information and generates no shadow prices. For a practitioner who needs to know which of the 11 gearbox constraints is the binding bottleneck and by how much — the actionable design insight — COO provides this information and PSO does not.\n\n\nP3, P4 — Honest failure analysis\n\n\n\n\n\n\nWarning\n\n\n\nCOO performs poorly on the welded beam (P3, mean gap ~640%) and tension/compression spring (P4, mean gap ~124%).\n\n\nThese problems have narrow feasible corridors. When the feasible region is a thin valley, sequential Snell-KKT reflections trap the trajectory in a bouncing pattern between opposing walls — the algorithm cannot traverse the corridor effectively. This is an analytically understood structural limitation of the current algorithm, not a parameter sensitivity issue.\nCOO is designed for problems where constraints are active at the optimum and there is geometric structure to exploit at the boundary. Narrow tunnel geometry violates the Normal Approach Condition (NAC) that underlies the algorithm’s geometric efficiency. For such problems, standard gradient projection or interior-point methods are preferable.\n\n\nP6 — Parameter sensitivity\nCOO achieves SR = 0% on P6 (Himmelblau’s function with tight constraints) under default parameters (\\(\\tau = 10\\)). The Ombra fires too rarely and the algorithm exhausts its budget before converging to within the 1% success threshold. Reducing \\(\\tau\\) to 5 addresses this. This is a parameter sensitivity issue, not a fundamental limitation. See Practitioner Guidelines → for parameter tuning guidance."
+  },
+  {
+    "objectID": "projects/coo/results.html#cost-profile",
+    "href": "projects/coo/results.html#cost-profile",
+    "title": "Experimental Results",
+    "section": "Cost Profile",
+    "text": "Cost Profile\nCOO uses approximately 1,500 gradient evaluations across every problem — flat and predictable regardless of difficulty. This is because the Lumen runs for a fixed iteration budget and the Ombra sub-calls use at most 300 steps. For applications with expensive gradient evaluations, a predictable and budget-bounded method is a practical advantage independent of its accuracy."
+  },
+  {
+    "objectID": "projects/coo/results.html#shadow-price-quality",
+    "href": "projects/coo/results.html#shadow-price-quality",
+    "title": "Experimental Results",
+    "section": "Shadow Price Quality",
+    "text": "Shadow Price Quality\nA result with no analogue in the comparison methods: COO generates converging KKT multiplier estimates throughout the optimization run. For P5 (speed reducer), the Luminosity Flux at convergence identifies the binding gearbox constraint — the one limiting the design — and provides its shadow price (sensitivity to relaxation). This information guides the next design iteration. Neither PGD nor PSO generates it.\nTheorem 5 establishes \\(\\|\\bar\\Lambda_k - \\lambda^*\\| = O(1/k^2)\\) for the averaged Luminosity Flux. The individual multipliers at each boundary event decay to zero as the orbit converges (see Remark 6 in the paper) — the averaging is not merely convenient but necessary to recover the true shadow prices."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html",
+    "href": "projects/coo/guidelines.html",
+    "title": "Practitioner Guidelines",
+    "section": "",
+    "text": "COO is well-suited for constrained nonlinear optimization problems with the following characteristics:\nSmooth objective and constraints. \\(f\\) and \\(G_i\\) are continuously differentiable, and gradients are available — analytically, via automatic differentiation, or via finite differences. The Störmer-Verlet integrator requires Lipschitz-continuous gradients (Assumption A1).\nActive constraints at the optimum. The engineering design has binding inequality constraints — walls that the optimal solution presses against. COO’s geometric insight is most powerful at constraint boundaries. If the optimal solution is in the interior of the feasible set, standard unconstrained Nesterov acceleration (NAG/FISTA) is sufficient and simpler.\nShadow prices needed. You want to know not just what the optimal design is, but why it cannot be better — which constraint is limiting, and by how much. COO generates KKT multiplier estimates throughout the optimization run, not only at the terminal point.\nModerate-to-high dimension with expensive gradients. COO’s \\(O(\\varepsilon^{-1/3})\\) primal rate and flat ~1,500 gradient evaluation budget make it competitive for simulation-based design optimization where each gradient call involves a finite-element solve, CFD run, or experimental measurement.\nMultiple active constraints (5–20+). COO handles each constraint boundary independently via sequential Snell-KKT reflections. The 11-constraint speed reducer (P5) is the benchmark showing this most clearly — where penalty gradient descent fails entirely."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#when-to-use-coo",
+    "href": "projects/coo/guidelines.html#when-to-use-coo",
+    "title": "Practitioner Guidelines",
+    "section": "",
+    "text": "COO is well-suited for constrained nonlinear optimization problems with the following characteristics:\nSmooth objective and constraints. \\(f\\) and \\(G_i\\) are continuously differentiable, and gradients are available — analytically, via automatic differentiation, or via finite differences. The Störmer-Verlet integrator requires Lipschitz-continuous gradients (Assumption A1).\nActive constraints at the optimum. The engineering design has binding inequality constraints — walls that the optimal solution presses against. COO’s geometric insight is most powerful at constraint boundaries. If the optimal solution is in the interior of the feasible set, standard unconstrained Nesterov acceleration (NAG/FISTA) is sufficient and simpler.\nShadow prices needed. You want to know not just what the optimal design is, but why it cannot be better — which constraint is limiting, and by how much. COO generates KKT multiplier estimates throughout the optimization run, not only at the terminal point.\nModerate-to-high dimension with expensive gradients. COO’s \\(O(\\varepsilon^{-1/3})\\) primal rate and flat ~1,500 gradient evaluation budget make it competitive for simulation-based design optimization where each gradient call involves a finite-element solve, CFD run, or experimental measurement.\nMultiple active constraints (5–20+). COO handles each constraint boundary independently via sequential Snell-KKT reflections. The 11-constraint speed reducer (P5) is the benchmark showing this most clearly — where penalty gradient descent fails entirely."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#when-not-to-use-coo-current-version",
+    "href": "projects/coo/guidelines.html#when-not-to-use-coo-current-version",
+    "title": "Practitioner Guidelines",
+    "section": "When NOT to Use COO (Current Version)",
+    "text": "When NOT to Use COO (Current Version)\nNarrow feasible corridors. If the feasible region is a thin tunnel (e.g., the welded beam or spring problems), sequential reflections trap the trajectory between opposing walls. Standard gradient projection or interior-point methods are preferable for such geometry.\nEquality constraints. The current algorithm handles inequality constraints. Equality constraints can be split into two inequalities (\\(h(x) = 0 \\Rightarrow h(x) \\leq 0\\) and \\(-h(x) \\leq 0\\)), but this doubles the constraint count and may degrade performance.\nNon-smooth objectives. The leapfrog integrator requires \\(L\\)-smooth \\(f\\). For non-smooth problems, use subgradient methods or smoothing.\nGlobal optimality required. COO is a local optimizer — Theorem 4 guarantees an ε-KKT point, not the global minimum. For guaranteed global solutions on non-convex problems, combine COO with a global search strategy: use PSO or a grid search for global exploration, COO for local refinement with shadow prices."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#parameters",
+    "href": "projects/coo/guidelines.html#parameters",
+    "title": "Practitioner Guidelines",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\n\n\n\n\n\n\nParameter\nDefault\nRole\nTuning Guidance\n\n\n\n\n\\(s = 1/L\\)\nAuto-estimated\nLumen step size\nEstimated from initial gradient difference; rarely needs adjustment. If the Lumen trajectory shows energy drift, reduce by 50%.\n\n\n\\(h\\)\n\\(0.1/L\\)\nOmbra step size\nKeep \\(hL &lt; 1\\) for stability. Smaller = more stable, larger = faster per Ombra step.\n\n\n\\(\\gamma\\)\n\\(0.5\\)\nOmbra damping\nHigher = faster local convergence. If Ombra overshoots near flat minima, reduce to 0.2.\n\n\n\\(\\tau\\)\n\\(10\\)\nAPF percentile threshold\nRaise to 20–30 if Ombra fires too rarely (too few \\(x_{\\text{best}}\\) updates). Lower to 5 if Ombra fires every few steps but doesn’t improve \\(f_{\\text{best}}\\).\n\n\n\\(C\\)\n\\(50\\)\nAPF cooldown (steps)\nPrevents repeated Ombra spawns from the same trajectory region. Increase for high-dimensional problems.\n\n\n\\(N_{\\max}\\)\n\\(5000\\)\nMax Lumen iterations\nThe primary budget parameter. Increase for problems with many constraints or large feasible regions.\n\n\n\\(N_{\\text{Ombra}}\\)\n\\(300\\)\nMax Ombra steps\nSufficient for most problems under the exponential convergence rate. Increase only if Ombra regularly hits this limit without converging.\n\n\n\n\nRecommended starting configuration\nFor a new problem, begin with all defaults. Run once and inspect:\n\nHow many times did the Ombra fire? (check k_last history) — If fewer than 3 times, lower \\(\\tau\\).\nDid \\(f_{\\text{best}}\\) improve after each Ombra? — If not, check that the spawn point is feasible and that \\(H_0\\) at spawn is indeed low.\nHas the Luminosity Flux \\(\\bar\\Lambda_k\\) stabilized? — Plot it. If still varying at termination, increase \\(N_{\\max}\\)."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#implementation-checklist",
+    "href": "projects/coo/guidelines.html#implementation-checklist",
+    "title": "Practitioner Guidelines",
+    "section": "Implementation Checklist",
+    "text": "Implementation Checklist\nBefore running COO on a new problem:\n\nImplement \\(f(x)\\) and \\(\\nabla f(x)\\); verify gradient against finite differences at a test point\nImplement each \\(G_i(x)\\) and \\(\\nabla G_i(x)\\); verify constraint values at known feasible and infeasible points\nConfirm starting point \\(x_0\\) is feasible; run Phase-1 if needed: minimize \\(\\sum_i \\max(0, G_i(x))^2\\) to find a feasible point\nRun the built-in Lipschitz estimator to set \\(s = 1/\\hat{L}\\); spot-check \\(\\hat{L}\\) at 2–3 points\nRun once with default parameters; check success rate over 5 seeds\nIf SR &lt; 60%, diagnose: (a) narrow feasible region? (b) APF firing too rarely? (c) Ombra not converging? (d) budget too small?"
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#reading-the-shadow-prices",
+    "href": "projects/coo/guidelines.html#reading-the-shadow-prices",
+    "title": "Practitioner Guidelines",
+    "section": "Reading the Shadow Prices",
+    "text": "Reading the Shadow Prices\nThe Luminosity Flux output \\(\\bar{\\Lambda} = [\\bar\\lambda_1, \\ldots, \\bar\\lambda_m]\\) contains the averaged KKT multiplier for each constraint.\nInterpretation:\n\n\\(\\bar\\lambda_i \\approx 0\\): constraint \\(i\\) is slack at the optimum — relaxing it would not improve the objective.\n\\(\\bar\\lambda_i &gt; 0\\): constraint \\(i\\) is binding — costing you \\(\\bar\\lambda_i\\) units of objective improvement per unit of constraint relaxation.\nThe constraint with the largest \\(\\bar\\lambda_i\\) is the binding bottleneck — the first place to invest redesign effort.\n\nConvergence check. Plot \\(\\bar\\Lambda_k\\) over iterations. It should stabilize to a constant vector as the algorithm progresses (Theorem 5: \\(O(1/k^2)\\) convergence). If it has not stabilized at termination, increase \\(N_{\\max}\\). Instability after 3,000+ steps usually indicates the trajectory has not accumulated enough boundary events near \\(x^*\\) — check whether the Lumen is spending time near the active constraints.\nNote on individual events. Individual multiplier values \\(\\lambda_i^{(j)}\\) at each boundary event decay to zero as the algorithm converges (the approach momentum decreases as the orbit tightens). The average \\(\\bar\\Lambda_k\\) correctly recovers \\(\\lambda^*\\) even as individual events become small — this is by design, not a numerical artifact. See the Methodology page for the formal result."
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#citation",
+    "href": "projects/coo/guidelines.html#citation",
+    "title": "Practitioner Guidelines",
+    "section": "Citation",
+    "text": "Citation\nIf COO is useful in your research or engineering practice, please cite the paper:\n\nNabhan, M. (2026). Clair-Obscur Optimization: A Hamiltonian Algorithm for Constrained Nonlinear Optimization with Embedded Dual Certificates. Applied Mathematical Modelling. DOI: [pending — will be updated at publication]\n\nBibTeX:\n@article{nabhan2026coo,\n  title   = {Clair-Obscur Optimization: A Hamiltonian Algorithm for\n             Constrained Nonlinear Optimization with Embedded Dual Certificates},\n  author  = {Nabhan, Mohammad},\n  journal = {Applied Mathematical Modelling},\n  year    = {2026},\n  note    = {Under review. DOI pending.}\n}"
+  },
+  {
+    "objectID": "projects/coo/guidelines.html#getting-the-code",
+    "href": "projects/coo/guidelines.html#getting-the-code",
+    "title": "Practitioner Guidelines",
+    "section": "Getting the Code",
+    "text": "Getting the Code\nSource code and benchmark scripts will be released in the GitHub repository upon paper acceptance, with a citable Zenodo DOI. The release will include:\n\nFull COO implementation (Python, NumPy)\nAll six CEC 2020 benchmark problem definitions\nReproduction scripts for all results in the paper\nA minimal working example for a new problem"
+  },
+  {
+    "objectID": "projects/coo/index.html",
+    "href": "projects/coo/index.html",
+    "title": "Clair-Obscur Optimization",
+    "section": "",
+    "text": "Note\n\n\n\nStatus: Manuscript under review — Applied Mathematical Modelling. This page presents the core contributions. Full source code and supplementary materials will be released upon acceptance."
+  },
+  {
+    "objectID": "projects/coo/index.html#what-is-coo",
+    "href": "projects/coo/index.html#what-is-coo",
+    "title": "Clair-Obscur Optimization",
+    "section": "What is COO?",
+    "text": "What is COO?\nClair-Obscur Optimization (COO) is a first-order algorithm for solving constrained nonlinear optimization problems of the form:\n\\[\\min_{x \\in \\mathbb{R}^n} f(x) \\quad \\text{subject to} \\quad G_i(x) \\leq 0, \\quad i = 1, \\ldots, m\\]\nCOO is built around a single mathematical insight: the vector form of Snell’s law of elastic reflection and the Karush-Kuhn-Tucker (KKT) first-order optimality conditions are algebraically the same equation. This identity allows the algorithm to extract KKT multipliers (shadow prices) at every constraint boundary contact — at first-order cost, without any augmented Lagrangian, dual update step, or additional tuning parameter.\nThe name reflects the algorithm’s two alternating phases: Lumen (light — conservative Hamiltonian exploration) and Ombra (shadow — dissipative local convergence). Shadow prices are generated at the boundary between these two regimes, exactly as light produces a shadow at the interface between illuminated and dark regions."
+  },
+  {
+    "objectID": "projects/coo/index.html#key-results",
+    "href": "projects/coo/index.html#key-results",
+    "title": "Clair-Obscur Optimization",
+    "section": "Key Results",
+    "text": "Key Results\n\n\n\n\n\n\n\n\nResult\nStatement\nRate\n\n\n\n\nPrimal gradient norm\n\\(\\|\\nabla f(x_k)\\|^2 = o(1/k^3)\\)\nOptimal first-order\n\n\nPrimal function value\n\\(f(x_k) - f^* = O(1/k^2)\\)\nNesterov-accelerated\n\n\nOmbra local convergence\n\\(f(u_n) - f^* \\leq H_0 \\cdot r^n\\)\nExponential\n\n\nGlobal ε-KKT guarantee\n\\(\\exists\\, \\hat{x}, \\hat{\\lambda}\\) satisfying ε-KKT\nConstructive\n\n\nDual certificate\n\\(\\|\\bar{\\Lambda}_k - \\lambda^*\\| = O(1/k^2)\\)\nWithout dual update\n\n\n\nThe dual convergence result (last row) is the paper’s primary contribution: true KKT multipliers recovered from the trajectory average, with no additional algorithmic machinery beyond the primal optimization loop."
+  },
+  {
+    "objectID": "projects/coo/index.html#sections",
+    "href": "projects/coo/index.html#sections",
+    "title": "Clair-Obscur Optimization",
+    "section": "Sections",
+    "text": "Sections\n\nMethodology — The Snell-KKT identity, the two-phase algorithm, and the convergence theory\nInteractive Demo — Visualize the COO trajectory on benchmark problems (activated at publication)\nExperimental Results — Benchmark comparison against gradient projection and PSO on six CEC 2020 problems\nPractitioner Guidelines — When to use COO, parameter selection, shadow price interpretation, and citation"
+  },
+  {
+    "objectID": "projects/coo/index.html#citation",
+    "href": "projects/coo/index.html#citation",
+    "title": "Clair-Obscur Optimization",
+    "section": "Citation",
+    "text": "Citation\n\n\n\n\n\n\nTip\n\n\n\nCitation details will be added upon publication. In the meantime, if you are referencing this work in a preprint or internal report, please use the format below.\n\n\n\nNabhan, M. (2026). Clair-Obscur Optimization: A Hamiltonian Algorithm for Constrained Nonlinear Optimization with Embedded Dual Certificates. Manuscript under review — Applied Mathematical Modelling."
+  },
+  {
+    "objectID": "projects/coo/index.html#contact",
+    "href": "projects/coo/index.html#contact",
+    "title": "Clair-Obscur Optimization",
+    "section": "Contact",
+    "text": "Contact\nFor questions about this work, please reach out via GitHub or see the About page."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Dr. Mohammad Nabhan",
+    "section": "",
+    "text": "Assistant Professor — Industrial & Systems Engineering King Fahd University of Petroleum and Minerals (KFUPM), Dhahran, Saudi Arabia\nMy research develops optimization algorithms and computational methods for engineering systems, with a focus on constrained nonlinear optimization, convergence theory, and practitioner-ready implementations.\nView Research → About →"
+  },
+  {
+    "objectID": "index.html#research",
+    "href": "index.html#research",
+    "title": "Dr. Mohammad Nabhan",
+    "section": "Research",
+    "text": "Research\n\nClair-Obscur Optimization (COO) Under Review\nA constrained nonlinear optimization algorithm built on a novel algebraic identity: the vector form of Snell’s law of refraction and the KKT first-order optimality conditions are the same equation. COO generates shadow prices (KKT multipliers) at first-order cost as a geometric byproduct of Hamiltonian boundary dynamics — no augmented Lagrangian, no dual update, no tuning.\n\nPrimal convergence: \\(\\|\\nabla f(x_k)\\|^2 = o(1/k^3)\\) — optimal Nesterov-accelerated rate\nDual convergence: \\(\\|\\bar{\\Lambda}_k - \\lambda^*\\| = O(1/k^2)\\) — shadow prices without any dual update step\nBenchmark: 100% success rate on 3/6 CEC 2020 engineering problems; sole gradient method to solve the 11-constraint speed reducer\n\nProject Hub →\n\n\nMore projects will appear here as work progresses."
+  },
+  {
+    "objectID": "projects/coo/methodology.html",
+    "href": "projects/coo/methodology.html",
+    "title": "Methodology",
+    "section": "",
+    "text": "The paper’s intellectual contribution rests on a single observation: when written in vector form for \\(n\\) dimensions, the Snell law of elastic reflection and the KKT first-order optimality conditions are the same equation. This is not an analogy — it is an algebraic identity, derived from first principles by imposing two simultaneous requirements on any boundary operator.\n\n\nAt a point \\(x\\) on the constraint boundary \\(G_i(x) = 0\\), we require a momentum update mapping incoming momentum \\(p^-\\) to outgoing momentum \\(p^+\\) satisfying:\nRequirement 1 — Normality (KKT stationarity). The momentum change must be along the constraint gradient: \\[p^+ - p^- = \\lambda_i \\nabla G_i(x)\\]\nFrom optimization: KKT stationarity requires the net impulse at the boundary to be normal to the constraint surface. From physics: a frictionless wall exerts only a normal force. Both give the same structural form.\nRequirement 2 — Hamiltonian conservation. Total energy is unchanged: \\[\\|p^+\\|^2 = \\|p^-\\|^2\\]\nSubstituting the first requirement into the second and solving for the scalar \\(\\lambda_i\\) yields the unique non-trivial solution:\n\\[\\boxed{p^+ = p^- + \\lambda_i \\nabla G_i(x), \\qquad \\lambda_i = -\\frac{2\\langle p^-, \\nabla G_i(x)\\rangle}{\\|\\nabla G_i(x)\\|^2}}\\]\nThis is the Snell-KKT operator. The scalar \\(\\lambda_i\\) it produces is simultaneously the elastic impulse coefficient that reflects the trajectory and the KKT multiplier (shadow price) for constraint \\(i\\) — generated as a byproduct of enforcing Hamiltonian conservation at the constraint wall.\n\n\n\nLemma 2 establishes four properties of the Snell-KKT operator, satisfied exactly (not approximately):\n\nKKT stationarity: \\(\\Delta p = \\lambda_i \\nabla G_i(x)\\) — momentum change is normal to the constraint surface\nHamiltonian conservation: \\(H(x, p^+) = H(x, p^-)\\) — proved algebraically, not approximately\nDual feasibility: \\(\\lambda_i \\geq 0\\) when the trajectory arrives from the feasible interior\nComplementary slackness: \\(\\lambda_i = 0\\) for all inactive constraints\n\nThese are precisely the four KKT conditions, satisfied at every boundary event throughout the algorithm’s run — not just at the terminal point.\n\n\n\nThe Snell-KKT identity is not an ad hoc construction. It is the conclusion of a four-century trajectory of variational thinking about light-surface interaction: from Heron of Alexandria (c. 60 CE), who showed reflected light takes the minimum total path, through Fermat’s principle (1657), to the modern vector formulation in Born and Wolf (1999). The optimization connection arises because both fields — geometric optics and constrained optimization — derive from the same variational framework."
+  },
+  {
+    "objectID": "projects/coo/methodology.html#the-core-insight",
+    "href": "projects/coo/methodology.html#the-core-insight",
+    "title": "Methodology",
+    "section": "",
+    "text": "The paper’s intellectual contribution rests on a single observation: when written in vector form for \\(n\\) dimensions, the Snell law of elastic reflection and the KKT first-order optimality conditions are the same equation. This is not an analogy — it is an algebraic identity, derived from first principles by imposing two simultaneous requirements on any boundary operator.\n\n\nAt a point \\(x\\) on the constraint boundary \\(G_i(x) = 0\\), we require a momentum update mapping incoming momentum \\(p^-\\) to outgoing momentum \\(p^+\\) satisfying:\nRequirement 1 — Normality (KKT stationarity). The momentum change must be along the constraint gradient: \\[p^+ - p^- = \\lambda_i \\nabla G_i(x)\\]\nFrom optimization: KKT stationarity requires the net impulse at the boundary to be normal to the constraint surface. From physics: a frictionless wall exerts only a normal force. Both give the same structural form.\nRequirement 2 — Hamiltonian conservation. Total energy is unchanged: \\[\\|p^+\\|^2 = \\|p^-\\|^2\\]\nSubstituting the first requirement into the second and solving for the scalar \\(\\lambda_i\\) yields the unique non-trivial solution:\n\\[\\boxed{p^+ = p^- + \\lambda_i \\nabla G_i(x), \\qquad \\lambda_i = -\\frac{2\\langle p^-, \\nabla G_i(x)\\rangle}{\\|\\nabla G_i(x)\\|^2}}\\]\nThis is the Snell-KKT operator. The scalar \\(\\lambda_i\\) it produces is simultaneously the elastic impulse coefficient that reflects the trajectory and the KKT multiplier (shadow price) for constraint \\(i\\) — generated as a byproduct of enforcing Hamiltonian conservation at the constraint wall.\n\n\n\nLemma 2 establishes four properties of the Snell-KKT operator, satisfied exactly (not approximately):\n\nKKT stationarity: \\(\\Delta p = \\lambda_i \\nabla G_i(x)\\) — momentum change is normal to the constraint surface\nHamiltonian conservation: \\(H(x, p^+) = H(x, p^-)\\) — proved algebraically, not approximately\nDual feasibility: \\(\\lambda_i \\geq 0\\) when the trajectory arrives from the feasible interior\nComplementary slackness: \\(\\lambda_i = 0\\) for all inactive constraints\n\nThese are precisely the four KKT conditions, satisfied at every boundary event throughout the algorithm’s run — not just at the terminal point.\n\n\n\nThe Snell-KKT identity is not an ad hoc construction. It is the conclusion of a four-century trajectory of variational thinking about light-surface interaction: from Heron of Alexandria (c. 60 CE), who showed reflected light takes the minimum total path, through Fermat’s principle (1657), to the modern vector formulation in Born and Wolf (1999). The optimization connection arises because both fields — geometric optics and constrained optimization — derive from the same variational framework."
+  },
+  {
+    "objectID": "projects/coo/methodology.html#the-algorithm",
+    "href": "projects/coo/methodology.html#the-algorithm",
+    "title": "Methodology",
+    "section": "The Algorithm",
+    "text": "The Algorithm\nCOO operates by alternating two phases governed by different integrators, with a statistical trigger managing the switch.\n\nPhase 1 — Lumen (Conservative Exploration)\nThe Lumen phase uses the Störmer-Verlet (leapfrog) integrator — the standard symplectic integrator for Hamiltonian systems. One step with step size \\(s = 1/L\\) (where \\(L\\) is the Lipschitz constant of \\(\\nabla f\\)):\n\\[p_{k+1/2} = p_k - \\frac{s}{2}\\nabla f(x_k)\\] \\[x_{k+1} = x_k + s \\cdot p_{k+1/2}\\] \\[p_{k+1} = p_{k+1/2} - \\frac{s}{2}\\nabla f(x_{k+1})\\]\nWhen the proposed position \\(x_{k+1}\\) would violate constraint \\(i\\), the Snell-KKT operator is applied to \\(p_{k+1/2}\\) before the position update. Crucially, \\(x_k\\) is never modified during boundary handling — only the momentum is reflected. The position update then proceeds with the reflected momentum, keeping the trajectory feasible.\nThe Störmer-Verlet integrator is equivalent to Nesterov’s Accelerated Gradient Descent at the continuous-time limit (Zhang et al., 2021; Campos et al., 2023). This equivalence is the foundation of Theorem 1’s \\(o(1/k^3)\\) gradient norm rate.\n\n\nThe Luminosity Flux\nEach Snell-KKT boundary event at step \\(j\\) emits a multiplier \\(\\lambda_i^{(j)}\\). These are accumulated into the Luminosity Flux:\n\\[\\bar{\\Lambda}_k = \\frac{1}{N_k} \\sum_{j=1}^{N_k} \\lambda_i^{(j)}\\]\nwhere \\(N_k\\) counts Snell-KKT events (not Householder fallback events) up to step \\(k\\). Theorem 5 establishes \\(\\bar{\\Lambda}_k \\to \\lambda_i^*\\) at \\(O(1/k^2)\\).\n\n\nTrigger — Adaptive Percentile Filter (APF)\nThe APF monitors the rolling Hamiltonian history and fires the Ombra phase when three conditions hold simultaneously:\n\nSufficient history has accumulated (\\(|\\text{history}| \\geq 20\\))\nThe current Hamiltonian is anomalously low: \\(H_{k+1} &lt; \\text{Percentile}_\\tau(\\text{history})\\)\nA cooldown period has elapsed: \\(k - k_{\\text{last}} \\geq C\\)\n\nThe percentile criterion is self-calibrating: it fires when the current state is anomalously close to a minimum relative to recent experience, regardless of the problem’s absolute energy scale. This makes COO robust across problems with very different objective magnitudes.\n\n\nPhase 2 — Ombra (Dissipative Convergence)\nWhen triggered, the Ombra phase uses the conformal Störmer-Verlet (O-SV) integrator — a geometrically motivated damped integrator:\n\\[\\mu = e^{-\\gamma h/2}, \\quad v_{n+1/2} = \\mu v_n - \\frac{h}{2}\\nabla f(u_n), \\quad u_{n+1} = u_n + h\\, v_{n+1/2}, \\quad v_{n+1} = \\mu\\, v_{n+1/2} - \\frac{h}{2}\\nabla f(u_{n+1})\\]\nThe damping factor \\(\\mu \\in (0,1)\\) removes kinetic energy at each step. Theorem 3 establishes the exponential rate \\(f(u_n) - f^* \\leq H_0 \\cdot r^n\\) where \\(r = (1-\\varepsilon h/2)/(1+\\varepsilon h/2) \\in (0,1)\\).\nThe Lumen resumes from its exact pre-Ombra state after the Ombra sub-call returns — the two phases are fully independent. The Lumen’s Hamiltonian is preserved through every spawn-and-return cycle."
+  },
+  {
+    "objectID": "projects/coo/methodology.html#convergence-theory",
+    "href": "projects/coo/methodology.html#convergence-theory",
+    "title": "Methodology",
+    "section": "Convergence Theory",
+    "text": "Convergence Theory\nThe paper establishes five results, structured as a dependency chain. Each theorem handles one component of the algorithm and cites an independent external reference.\n\n\n\n\n\n\n\n\n\nResult\nTheorem\nCore Reference\nAssumptions\n\n\n\n\nInterior gradient norm: \\(\\|\\nabla f\\|^2 = o(1/k^3)\\)\nThm 1\nChen et al. (2022)\nA1, A2, A5\n\n\nBoundary Lyapunov invariance (segment chaining)\nThm 2\nLyapunov argument\nA1–A5\n\n\nOmbra exponential rate: \\(r^n\\)\nThm 3\nViorel et al. (2021)\nA1, A3, A5\n\n\nGlobal ε-KKT convergence\nThm 4\nEkeland (1979)\nA1–A5\n\n\nDual certificate: \\(O(1/k^2)\\)\nThm 5\nGuminov et al. (2019)\nA1, A2, A4, A5\n\n\n\n\nThe Key Insight in Theorem 2\nThe Lyapunov function from Chen et al. (2022), \\[V_k = (k+a)^2\\bigl(f(x_k) - f^*\\bigr) + \\frac{1}{2s}\\left\\|x_k - x^* + \\frac{(k+a)s}{2}\\nabla f(x_k)\\right\\|^2\\] depends on \\(x_k\\) and \\(\\nabla f(x_k)\\) — but not directly on \\(p_k\\). Since Snell-KKT boundary events modify only \\(p_k\\) while leaving \\(x_k\\) fixed, they leave \\(V_k\\) unchanged. The Lyapunov decrease from interior Lumen steps is fully preserved across any number of boundary contacts. This “segment chaining” argument is what allows a single convergence rate to apply to the full algorithm with arbitrarily many boundary interactions.\n\n\nThe Proof Strategy for Theorem 5\nThe dual convergence proof proceeds in three steps:\n\nLinearize near \\(x^*\\): reduce the full constrained problem to a local linear equality-constrained quadratic problem near the optimal boundary point.\nImport Guminov et al. (2019), Theorem 3: apply the accelerated primal-dual theorem to the linearized problem. Under LICQ (linearly independent active constraint gradients), this gives \\(O(1/k^2)\\) for both primal and dual averages.\nClose the inexact-Uzawa gap: the Lumen performs one leapfrog step per iteration rather than the exact primal minimization the Guminov theorem assumes. This approximation error is \\(O(1/k^4)\\) per step — absolutely summable — and leaves the asymptotic \\(O(1/k^2)\\) dual rate unchanged."
+  },
+  {
+    "objectID": "projects/coo/methodology.html#comparison-with-existing-methods",
+    "href": "projects/coo/methodology.html#comparison-with-existing-methods",
+    "title": "Methodology",
+    "section": "Comparison with Existing Methods",
+    "text": "Comparison with Existing Methods\n\n\n\n\n\n\n\n\n\nMethod\nDual output\nPrimal rate\nArchitecture\n\n\n\n\nGradient projection\nPost-hoc only\n\\(O(\\varepsilon^{-1/2})\\)\nProjects momentum at boundary\n\n\nAugmented Lagrangian\nExplicit dual update step\n\\(O(\\varepsilon^{-1/2})\\)\nMaintains \\(\\lambda^k\\) as algorithmic variable\n\n\nInterior-point\nAt solution only\n\\(O(n^{3.5}\\log(1/\\varepsilon))\\)\nDense linear systems\n\n\nCOO\nAt every boundary event\n\\(O(\\varepsilon^{-1/3})\\) primal\nMeasures \\(\\lambda\\) from geometry\n\n\n\nThe distinction from gradient projection is structural: projection discards the approach momentum (replacing it with the tangent-direction vector), while the Snell-KKT operator reflects only the normal component, preserving the tangential component and measuring the normal impulse as the KKT multiplier. Projection treats the constraint boundary as an obstacle; COO treats it as a measuring instrument.\nThe distinction from augmented Lagrangian is categorical: augmented Lagrangian multipliers are algorithmic decisions (updated by formula \\(\\lambda^{k+1} = \\lambda^k + \\rho c(x^k)\\)); COO’s Luminosity Flux multipliers are physical measurements — the elastic impulse coefficients at boundary contacts, computed directly from the trajectory geometry."
+  },
+  {
+    "objectID": "projects/coo/demo.html",
+    "href": "projects/coo/demo.html",
+    "title": "Interactive Demo",
+    "section": "",
+    "text": "Important\n\n\n\nThe interactive demo will be activated upon paper publication.\nThe demo runs entirely in your browser — no server, no installation, no account required. It uses marimo, a reactive Python notebook compiled to WebAssembly via Pyodide. There is no concurrency limit and no compute cost: the algorithm runs on your machine."
+  },
+  {
+    "objectID": "projects/coo/demo.html#what-the-demo-shows",
+    "href": "projects/coo/demo.html#what-the-demo-shows",
+    "title": "Interactive Demo",
+    "section": "What the Demo Shows",
+    "text": "What the Demo Shows\nThe COO algorithm alternates between two phases that are visually distinct in the trajectory plot:\nLumen phase — the trajectory moves like a frictionless billiard ball inside the feasible region \\(\\Omega\\), bouncing off constraint boundaries with exact energy conservation. At each boundary contact, the Snell-KKT operator is applied and a KKT multiplier \\(\\lambda_i^{(j)}\\) is emitted and accumulated.\nOmbra phase — when the Adaptive Percentile Filter detects a low-energy state, the dissipative integrator fires. The trajectory converges exponentially to the local minimum (visible as a rapid spiral inward), then the Lumen resumes from the same state it left.\nThe Luminosity Flux panel shows the running average \\(\\bar{\\Lambda}_k\\) converging toward the true KKT multiplier \\(\\lambda^*\\) as boundary events accumulate — the dual certificate building up in real time."
+  },
+  {
+    "objectID": "projects/coo/demo.html#what-you-will-be-able-to-adjust",
+    "href": "projects/coo/demo.html#what-you-will-be-able-to-adjust",
+    "title": "Interactive Demo",
+    "section": "What You Will Be Able to Adjust",
+    "text": "What You Will Be Able to Adjust\nWhen the demo is active, you will be able to:\n\nSelect from the six CEC 2020 engineering benchmark problems (P1–P6)\nAdjust COO parameters (\\(\\tau\\), \\(\\gamma\\), \\(N_{\\max}\\)) with sliders and observe how they affect convergence behavior\nToggle a side-by-side comparison with penalty gradient descent (PGD) on the same problem\nView the Luminosity Flux evolution alongside the primal trajectory\nExport the trajectory data as CSV for further analysis"
+  },
+  {
+    "objectID": "projects/coo/demo.html#benchmark-problems-preview",
+    "href": "projects/coo/demo.html#benchmark-problems-preview",
+    "title": "Interactive Demo",
+    "section": "Benchmark Problems (Preview)",
+    "text": "Benchmark Problems (Preview)\n\n\n\nCode\nProblem\nVariables\nConstraints\nCOO Success Rate\n\n\n\n\nP1\nThree-bar truss\n2\n3\n100%\n\n\nP2\nPressure vessel\n4\n4\n100%\n\n\nP3\nWelded beam\n4\n6\n20%\n\n\nP4\nTension/compression spring\n3\n4\n20%\n\n\nP5\nSpeed reducer (11 constraints)\n7\n11\n100%\n\n\nP6\nHimmelblau’s function\n2\n6\n0% (parameter sensitivity)\n\n\n\nFull results and analysis: Experimental Results →\n\n[Interactive content will appear here at publication. The demo notebook is being prepared alongside the paper submission.]"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Assistant Professor Department of Industrial & Systems Engineering King Fahd University of Petroleum and Minerals (KFUPM) Dhahran, Saudi Arabia\n\n\n\nConstrained nonlinear optimization and convergence theory\nHamiltonian methods and symplectic integrators in optimization\nEngineering systems design and analysis\nIndustrial and manufacturing systems\n\n\n\n\nGitHub: github.com/drmohammadnabhan\n\nThis site hosts research outputs from my group at KFUPM. All content is made available to support reproducibility and community adoption of the methods developed here. Source code is released on GitHub with citable Zenodo DOIs upon paper acceptance."
+  },
+  {
+    "objectID": "about.html#dr.-mohammad-nabhan",
+    "href": "about.html#dr.-mohammad-nabhan",
+    "title": "About",
+    "section": "",
+    "text": "Assistant Professor Department of Industrial & Systems Engineering King Fahd University of Petroleum and Minerals (KFUPM) Dhahran, Saudi Arabia\n\n\n\nConstrained nonlinear optimization and convergence theory\nHamiltonian methods and symplectic integrators in optimization\nEngineering systems design and analysis\nIndustrial and manufacturing systems\n\n\n\n\nGitHub: github.com/drmohammadnabhan\n\nThis site hosts research outputs from my group at KFUPM. All content is made available to support reproducibility and community adoption of the methods developed here. Source code is released on GitHub with citable Zenodo DOIs upon paper acceptance."
+  }
+]
